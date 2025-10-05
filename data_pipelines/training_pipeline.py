@@ -106,26 +106,43 @@ categorical_features = [
 
 class FeatureEngineer(BaseEstimator, TransformerMixin):
     """
-    Adds new features (e.g., BMI) and drops irrelevant columns.
+    Adds engineered features to improve model accuracy:
+    - BMI
+    - Screen_to_Activity ratio
+    - Age × Activity interaction
+    Drops irrelevant or intermediate columns.
     """
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
         X_ = X.copy()
-        
-        # Drop features we don't want to include
-        drop_cols = ['Activity_Level_Score', 'Height_cm', 'Weight_Kg']  # Weight & Height will be used to create BMI
-        for col in drop_cols:
-            if col not in X_.columns:
-                continue
 
-        # Feature engineering: BMI
+        # ----------------------
+        # 1️⃣ BMI
+        # ----------------------
         if 'Height_cm' in X_.columns and 'Weight_Kg' in X_.columns:
             X_['Height_m'] = X_['Height_cm'] / 100
             X_['BMI'] = X_['Weight_Kg'] / (X_['Height_m'] ** 2)
-            X_ = X_.drop(columns=['Height_cm', 'Weight_Kg', 'Height_m'])
-        
+
+        # ----------------------
+        # 2️⃣ Screen-to-Activity ratio
+        # ----------------------
+        if 'Screen_Time_Hours' in X_.columns and 'Activity_Level_Score' in X_.columns:
+            X_['Screen_to_Activity'] = X_['Screen_Time_Hours'] / (X_['Activity_Level_Score'] + 0.1)
+
+        # ----------------------
+        # 3️⃣ Age × Activity interaction
+        # ----------------------
+        if 'Age_Years' in X_.columns and 'Activity_Level_Score' in X_.columns:
+            X_['Age_Activity'] = X_['Age_Years'] * X_['Activity_Level_Score']
+
+        # ----------------------
+        # Drop intermediate / original columns
+        # ----------------------
+        drop_cols = ['Height_cm', 'Weight_Kg', 'Height_m']
+        X_ = X_.drop(columns=[c for c in drop_cols if c in X_.columns])
+
         return X_
 
 # ----------------------------

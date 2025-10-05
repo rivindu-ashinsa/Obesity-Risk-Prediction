@@ -1,12 +1,11 @@
 import pandas as pd
 from data_pipelines.training_pipeline import OutlierRemover, CategoryRenamer, MissingValueImputer,categorical_features, FeatureEngineer
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import GradientBoostingClassifier
-
 
 
 # 1️⃣ Load data
@@ -44,6 +43,7 @@ pipeline = Pipeline([
     ('impute', MissingValueImputer()),
     ('feature_eng', FeatureEngineer()),
     ('encode', preprocessor),
+    ('scaler', StandardScaler()),
     ('model', model)
 ])
 
