@@ -1,5 +1,5 @@
 import pandas as pd
-from data_pipelines.training_pipeline import OutlierRemover, CategoryRenamer, MissingValueImputer,categorical_features
+from data_pipelines.training_pipeline import OutlierRemover, CategoryRenamer, MissingValueImputer,categorical_features, FeatureEngineer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.compose import ColumnTransformer
@@ -42,6 +42,7 @@ model = GradientBoostingClassifier(n_estimators=200, random_state=42)
 pipeline = Pipeline([
     ('rename', CategoryRenamer()),
     ('impute', MissingValueImputer()),
+    ('feature_eng', FeatureEngineer()),
     ('encode', preprocessor),
     ('model', model)
 ])

@@ -103,6 +103,31 @@ categorical_features = [
         "Leisure Time Activity"
     ]
 
+
+class FeatureEngineer(BaseEstimator, TransformerMixin):
+    """
+    Adds new features (e.g., BMI) and drops irrelevant columns.
+    """
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X_ = X.copy()
+        
+        # Drop features we don't want to include
+        drop_cols = ['Activity_Level_Score', 'Height_cm', 'Weight_Kg']  # Weight & Height will be used to create BMI
+        for col in drop_cols:
+            if col not in X_.columns:
+                continue
+
+        # Feature engineering: BMI
+        if 'Height_cm' in X_.columns and 'Weight_Kg' in X_.columns:
+            X_['Height_m'] = X_['Height_cm'] / 100
+            X_['BMI'] = X_['Weight_Kg'] / (X_['Height_m'] ** 2)
+            X_ = X_.drop(columns=['Height_cm', 'Weight_Kg', 'Height_m'])
+        
+        return X_
+
 # ----------------------------
 # Main Training Pipeline
 # ----------------------------
